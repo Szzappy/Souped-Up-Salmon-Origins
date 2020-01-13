@@ -1,5 +1,8 @@
 HOW TO PLAY:
 
+TO START THE GAME PRESS ON THE game_script
+
+
 -WASD to move
 
 -Space to shoot
