@@ -1,0 +1,5 @@
+1. WASD to move
+2. Space bar to fire
+3. 150 score for next level
+4. to play, click on the python file called 'game_script' (the one above this file)
+5. enjoy!!!
