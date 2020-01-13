@@ -1,5 +1,6 @@
 To play this amazing game, you will need:
 
+- A python interpreter or IDLE
 - The pygame module installed on your PC
 
 To do this there are 2 ways:
