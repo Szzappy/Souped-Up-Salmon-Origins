@@ -1,0 +1,18 @@
+To play this amazing game, you will need:
+
+- The pygame module installed on your PC
+
+To do this there are 2 ways:
+1. just install the pygame module to your python 3.? folder
+
+2.(Easier for me!) 
+
+- install the latest version of pycharm community edition 
+- get an interpreter(this means install python 3.5 or 3.7 or 3.8 or something like that)
+- then go to the pycharm settings menu
+- go to Project: Souped Up Salmon Origins
+- Click on Project Interpreter
+- Add the interpreter (3.8 etc, etc)
+- Scroll through the package options and add pycharm
+
+Step 2 may seem to be a bit longer, but for me it was much easier (took me around 10 - 15 mins)!
