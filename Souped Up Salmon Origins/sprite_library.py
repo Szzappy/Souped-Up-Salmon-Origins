@@ -3,7 +3,6 @@ from hud_library import *
 pygame.mixer.init()
 import time
 
-
 class Sprite(UIElement):
     def __init__(self, position, size):
         UIElement.__init__(self, position, size)
@@ -48,6 +47,14 @@ class Enemy(Sprite):
     def __init__(self, position):
         Sprite.__init__(self, position, Vector(80, 48))
         image = pygame.image.load("assets/images/lvl1/8-bitEnemy.png")
+        brush = UIBrush(self._surface)
+        brush.draw_image((0.5, 0.5), (1, 1), image, scaled_mode=True)
+
+
+class EnemyX(Sprite):
+    def __init__(self, position):
+        Sprite.__init__(self, position, Vector(125, 78))
+        image = pygame.image.load("assets/images/bear.png")
         brush = UIBrush(self._surface)
         brush.draw_image((0.5, 0.5), (1, 1), image, scaled_mode=True)
 
@@ -146,6 +153,55 @@ class EnemyHandler(UIElement):
             vx = randint(-600, -100)
             vy = randint(-100, 100)
             enemy = Enemy(Vector(x, y))
+            enemy.add_velocity(Vector(vx, vy))
+            self.__enemies.append(enemy)
+
+    def update(self, delta_time: float):
+        for enemy in self.__enemies:
+            enemy.update(delta_time)
+
+        self.__enemies[:] = [enemy for enemy in self.__enemies if enemy.get_position().x > 0
+                             and not enemy.should_delete]
+        self.__enemies[:] = [enemy for enemy in self.__enemies if 720 > enemy.get_position().y > 0
+                             and not enemy.should_delete]
+
+        difference = self.__difficulty - len(self.__enemies)
+
+        if difference > 0:
+            self.add_enemies(difference)
+
+    def render(self, brush: UIBrush):
+        for bullet in self.__enemies:
+            bullet.render(brush)
+
+    def add_enemy(self, enemy_to_add):
+        self.__enemies.append(enemy_to_add)
+
+    def get_enemies(self):
+        return self.__enemies
+
+    def get_enemy_destroyed(self):
+        score = 0
+        for enemy in self.__enemies:
+            if enemy.destroyed_by_bullet:
+                score += 1
+        return score
+
+
+class EnemyHandlerX(UIElement):
+    def __init__(self, size, difficulty):
+        UIElement.__init__(self, Vector(), size)
+        self.__enemies = []
+        self.__difficulty = difficulty
+        self.add_enemies(difficulty)
+
+    def add_enemies(self, difficulty):
+        for count in range(difficulty):
+            x = 1400
+            y = randint(0, self._size.y)
+            vx = randint(-600, -100)
+            vy = randint(-100, 100)
+            enemy = EnemyX(Vector(x, y))
             enemy.add_velocity(Vector(vx, vy))
             self.__enemies.append(enemy)
 
@@ -659,7 +715,43 @@ class Lvl6Bullet(Sprite):
         brush.draw_image((0.5, 0.5), (1, 1), image, scaled_mode=True)
 
 
+class LvlXBullet(Sprite):
+    def __init__(self, position):
+        Sprite.__init__(self, position, Vector(50, 30))
+        image = pygame.image.load("assets/images/reverse.png")
+        brush = UIBrush(self._surface)
+        brush.draw_image((0.5, 0.5), (1, 1), image, scaled_mode=True)
+
+
 class BulletHandler(UIElement):
+    def __init__(self, size):
+        UIElement.__init__(self, Vector(), size)
+        self.__bullets = []
+
+    def update(self, delta_time: float):
+        for bullet in self.__bullets:
+            bullet.update(delta_time)
+        self.__bullets[:] = [bullet for bullet in self.__bullets if bullet.get_position().x < self._size.x and not bullet.should_delete]
+        self.__bullets[:] = [enemy for enemy in self.__bullets if bullet.get_position().x > 0 and not bullet.should_delete]
+
+    def render(self, brush: UIBrush):
+        for bullet in self.__bullets:
+            bullet.render(brush)
+
+    def add_bullet(self, bullet_to_add):
+        self.__bullets.append(bullet_to_add)
+
+    def check_collisions(self, enemy_handler):
+        enemies = enemy_handler.get_enemies()
+        for bullet in self.__bullets:
+            for enemy in enemies:
+                if bullet.does_collide_with(enemy):
+                    bullet.should_delete = True
+                    enemy.should_delete = True
+                    enemy.destroyed_by_bullet = True
+
+
+class BulletHandlerX(UIElement):
     def __init__(self, size):
         UIElement.__init__(self, Vector(), size)
         self.__bullets = []
@@ -799,7 +891,6 @@ class BulletHandler6(UIElement):
                     enemy.destroyed_by_bullet = True
 
 
-
 class Ship(Sprite):
     def __init__(self, position):
         Sprite.__init__(self, position, Vector(80, 38))
@@ -811,6 +902,38 @@ class Ship(Sprite):
 
     def fire(self, bullet_handler):
         bullet = Bullet(Vector(self._position.x, self._position.y))
+        bullet.add_velocity(Vector(750))
+        bullet_handler.add_bullet(bullet)
+
+    def get_lives_lost(self, ship):
+        if self.assault:
+            self.lives = self.lives - 1
+            self.assault = False
+        if self.lives <= 0:
+            pygame.quit()
+            quit(0)
+        return self.lives
+
+    def check_enemy_collision(self, enemy_handler):
+        for enemy in enemy_handler.get_enemies():
+            if enemy.does_collide_with(self):
+                enemy.should_delete = True
+                self.assault = True
+                return True
+        return False
+
+
+class ShipX(Sprite):
+    def __init__(self, position):
+        Sprite.__init__(self, position, Vector(110, 52))
+        image = pygame.image.load("assets/images/salmon.png")
+        brush = UIBrush(self._surface)
+        brush.draw_image((0.5, 0.5), (1, 1), image, scaled_mode=True)
+        self.lives = 5
+        self.assault = False
+
+    def fire(self, bullet_handler):
+        bullet = LvlXBullet(Vector(self._position.x, self._position.y))
         bullet.add_velocity(Vector(750))
         bullet_handler.add_bullet(bullet)
 
@@ -1060,6 +1183,14 @@ class Lvl6Background(Sprite):
     def __init__(self, position):
         Sprite.__init__(self, position, Vector(650, 850))
         image = pygame.image.load("assets/images/lvl6/backG.jpg")
+        brush = UIBrush(self._surface)
+        brush.draw_image((0.5, 0.5), (1, 1), image, scaled_mode=True)
+
+
+class LvlXBackground(Sprite):
+    def __init__(self, position):
+        Sprite.__init__(self, position, Vector(1280, 720))
+        image = pygame.image.load("assets/images/ocean.jpg")
         brush = UIBrush(self._surface)
         brush.draw_image((0.5, 0.5), (1, 1), image, scaled_mode=True)
 

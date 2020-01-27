@@ -36,7 +36,7 @@ class Button:
         if play.click():
             EnemyHandler.difficulty = 5
             mixer.music.pause()
-            lvl1()
+            lvl6()
 
 
 class Button2:
@@ -519,94 +519,14 @@ def lvl5():
 
 
 def lvl6():
-
-    while True:
-        window2 = UIWindow(Vector(650, 850), "LEVEL 6")
-        brush = window2.get_brush()
-
-        ship = Lvl6ship(Vector(325, 700))
-        enemy_handler = BossHandler(Vector(1000, 500), 20)
-        bullet_handler = BulletHandler6(Vector(650, 850))
-        background2 = Lvl6Background(Vector(325, 425))
-        # to calculate the position, take your x/y value and divide it by 2 and then do 1280(x) or 720(y) - your value
-
-        bosshp = 300
-        score_label = HUDLabel(Vector(100, 50), Vector(150, 100), "Boss HP: 300", SysFont("comic sans", 256),
-                               (255, 255, 255))
-
-        lives_label = HUDLabel(Vector(300, 50), Vector(150, 100), "Lives: 3", SysFont("comic sans", 256),
-                               (255, 255, 255))
-
-        pygame.mixer.music.load('assets/music/Ocean Man.mp3')
-        pygame.mixer.music.play(loops=-1)
-
-        while True:
-            delta_time = window2.wait() / 1000
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit(0)
-
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_w:
-                        ship.add_velocity(Vector(0, -400))
-                    elif event.key == pygame.K_a:
-                        ship.add_velocity(Vector(-450))
-                    elif event.key == pygame.K_s:
-                        ship.add_velocity(Vector(0, 400))
-                    elif event.key == pygame.K_d:
-                        ship.add_velocity(Vector(450))
-                    elif event.key == pygame.K_SPACE:
-                        ship.fire(bullet_handler)
-
-                elif event.type == pygame.KEYUP:
-                    if event.key == pygame.K_w:
-                        ship.add_velocity(Vector(0, 400))
-                    elif event.key == pygame.K_a:
-                        ship.add_velocity(Vector(450))
-                    elif event.key == pygame.K_s:
-                        ship.add_velocity(Vector(0, -400))
-                    elif event.key == pygame.K_d:
-                        ship.add_velocity(Vector(-450))
-
-            ship.update(delta_time)
-            bullet_handler.update(delta_time)
-            enemy_handler.update(delta_time)
-            bullet_handler.check_collisions(enemy_handler)
-
-            bosshp -= enemy_handler.get_enemy_destroyed()
-            score_label.set_text("Boss HP: " + str(bosshp))
-            score_label.update_appearance()
-
-            if ship.check_enemy_collision(enemy_handler):
-                lives = ship.get_lives_lost(ship)
-                lives_label.set_text("Lives: " + str(lives))
-                lives_label.update_appearance()
-
-            window2.clear()
-
-            background2.render(brush)
-            score_label.render(brush)
-            lives_label.render(brush)
-            enemy_handler.render(brush)
-            bullet_handler.render(brush)
-            ship.render(brush)
-
-            window2.show_frame()
-
-
-def lvl7():
-    x = randint(1, 250)
-    print(x)
     while True:
         window2 = UIWindow(Vector(1280, 720), "LEVEL 7")
         brush = window2.get_brush()
 
-        ship = Ship(Vector(100, 140))
-        enemy_handler = EnemyHandler(Vector(1000, 500), x)
-        bullet_handler = BulletHandler(Vector(1280, 720))
-        background2 = Lvl1Background(Vector(640, 360))
+        ship = ShipX(Vector(100, 140))
+        enemy_handler = EnemyHandlerX(Vector(1000, 500), 25)
+        bullet_handler = BulletHandlerX(Vector(1280, 720))
+        background2 = LvlXBackground(Vector(640, 360))
         # to calculate the position, take your x/y value and divide it by 2 and then do 1280(x) or 720(y) - your value
 
         score = 0
@@ -678,7 +598,7 @@ def lvl7():
 window = pygame.display.set_mode((800, 600))
 current_state = 0
 
-play = Button((350, 350), (80, 30), (140, 20, 120), (0, 0, 0), "PLAY", 5, lvl1)
+play = Button((350, 350), (80, 30), (140, 20, 120), (0, 0, 0), "PLAY", 5, lvl6)
 
 title_label = Button((250, 150), (320, 30), (0, 0, 0), (0, 0, 0), "SOUPED UP SALMON", 0,  None)
 title_label2 = Button((345, 180), (140, 30), (0, 0, 0), (0, 0, 0), "ORIGINS", 0,  None)
